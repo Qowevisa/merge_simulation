@@ -53,4 +53,18 @@ defmodule MergeSimulation do
       do_merge_list([s] ++ xs, acc ++ [f])
     end
   end
+
+  def merge_list_little_endian(list) do
+    do_merge_list_little_endian(list, [])
+  end
+
+  defp do_merge_list_little_endian(list, acc) do
+    [f, s] ++ xs = Enum.reverse(list)
+    if f == s do
+      Enum.reverse(xs) ++ [f + 1] ++ acc
+    else
+      if length(list) == 2, do: list ++ acc, else:
+      do_merge_list_little_endian(Enum.reverse(xs) ++ [s], [f] ++ acc)
+    end
+  end
 end
