@@ -16,7 +16,7 @@ defmodule MergeSimulation do
 
   @spec do_high_iterate(integer, list, atom) :: list
   defp do_high_iterate(num, list, inspect) do
-    new_list = if length(list) == 0, do: list ++ [0], else: merge_list(list ++ [0])
+    new_list = if length(list) == 0, do: list ++ [0], else: merge_list(list ++ [0], :high)
     if inspect == :yes, do: IO.inspect new_list, label: 'List in iteration'
     if num == 1 do
       new_list
@@ -40,6 +40,14 @@ defmodule MergeSimulation do
       [3, 2, 1, 0]
 
   """
+  def merge_list(list, endian) do
+    if endian == :high do
+      do_merge_list(list, [])
+    else
+      do_merge_list_little_endian(list, [])
+    end
+  end
+
   def merge_list(list) do
     do_merge_list(list, [])
   end
@@ -52,10 +60,6 @@ defmodule MergeSimulation do
       if length(list) == 2, do: acc ++ list, else:
       do_merge_list([s] ++ xs, acc ++ [f])
     end
-  end
-
-  def merge_list_little_endian(list) do
-    do_merge_list_little_endian(list, [])
   end
 
   defp do_merge_list_little_endian(list, acc) do

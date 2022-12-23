@@ -20,21 +20,21 @@ defmodule MergeSimulationTest do
     assert MergeSimulation.merge_list([2, 1, 0]) == [2, 1, 0]
   end
 
-  ## Testing little endian merge
+  ## Testing low endian merge
 
-  test "center little endian merge" do
-    assert MergeSimulation.merge_list_little_endian([4, 3, 3, 2, 1]) == [4, 4, 2, 1]
+  test "center low endian merge" do
+    assert MergeSimulation.merge_list([4, 4, 3, 3, 2, 1], :low) == [4, 4, 4, 2, 1]
   end
 
-  test "left little endian merge" do
-    assert MergeSimulation.merge_list_little_endian([3, 3, 2, 1]) == [4, 2, 1]
+  test "left low endian merge" do
+    assert MergeSimulation.merge_list([3, 3, 2, 1, 1], :low) == [3, 3, 2, 2]
   end
 
-  test "right little endian merge" do
-    assert MergeSimulation.merge_list_little_endian([2, 1, 0, 0]) == [2, 1, 1]
+  test "right low endian merge" do
+    assert MergeSimulation.merge_list([2, 2, 1, 0, 0], :low) == [2, 2, 1, 1]
   end
 
-  test "no little endian merge" do
-    assert MergeSimulation.merge_list_little_endian([4, 3, 2, 1, 0]) == [4, 3, 2, 1, 0]
+  test "no low endian merge" do
+    assert MergeSimulation.merge_list([4, 3, 2, 1, 0], :low) == [4, 3, 2, 1, 0]
   end
 end
