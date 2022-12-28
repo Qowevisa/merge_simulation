@@ -4,24 +4,63 @@ defmodule MergeSimulation do
   """
 
   @doc """
-  Simulates `num` high iterations. Can be inspected if passed `:yes` atom as second argument
+  Simulates `num` iterations. Simulation can be high or low.
+  Set second argument as :high atom and :low atom for low iteration respectively.
   """
-  def high_iterate(num) do
-    do_high_iterate(num, [], :no)
+  @spec iterate(pos_integer, atom) :: list
+  def iterate(num, :high) do
+    do_iterate(num, [], :high, :no)
   end
 
-  def high_iterate(num, inspect) do
-    do_high_iterate(num, [], inspect)
+  def iterate(num, :low) do
+    do_iterate(num, [], :low, :no)
   end
 
-  @spec do_high_iterate(integer, list, atom) :: list
-  defp do_high_iterate(num, list, inspect) do
-    new_list = if length(list) == 0, do: list ++ [0], else: merge_list(list ++ [0], :high)
-    if inspect == :yes, do: IO.inspect new_list, label: 'List in iteration'
+  def iterate(num, endian) do
+    if num < 0 do
+      raise("Inappropriate first argument! Expected value greater than zero but got #{inspect endian}")
+    end
+    if not (endian == :high or endian == :low) do
+      raise("Inappropriate second argument! Expected :high or :low but got #{inspect endian}")
+    end
+  end
+
+  @doc """
+  Simulates `num` iterations. Simulation can be high or low.
+  Set second argument as :high atom and :low atom for low iteration respectively.
+  Can be inspected if passed `:yes` atom as third argument
+  """
+  def iterate(num, :high, :yes) do
+    do_iterate(num, [], :high, :yes)
+  end
+
+  def iterate(num, :low, :yes) do
+    if num < 0 do
+      raise("Inappropriate first argument! Expected value greater than zero but got #{inspect num}")
+    end
+    do_iterate(num, [], :low, :yes)
+  end
+
+  def iterate(num, endian, inspect) do
+    if num < 0 do
+      raise("Inappropriate first argument! Expected value greater than zero but got #{inspect num}")
+    end
+    if not (endian == :high or endian == :low) do
+      raise("Inappropriate second argument! Expected :high or :low but got #{inspect endian}")
+    end
+    if not (inspect == :yes or endian == :no) do
+      raise("Inappropriate third argument! Expected :yes or :no but got #{inspect endian}")
+    end
+  end
+
+  @spec do_iterate(integer, list, atom, atom) :: list
+  defp do_iterate(num, list, endian, inspect) do
+    new_list = if length(list) == 0, do: list ++ [0], else: merge_list(list ++ [0], endian)
+    if inspect == :yes, do: IO.inspect new_list, label: 'List in iteration:'
     if num == 1 do
       new_list
     else
-      do_high_iterate(num - 1, new_list, inspect)
+      do_iterate(num - 1, new_list, endian, inspect)
     end
   end
 
