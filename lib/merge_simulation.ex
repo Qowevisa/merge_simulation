@@ -7,21 +7,12 @@ defmodule MergeSimulation do
   Simulates `num` iterations. Simulation can be high or low.
   Set second argument as :high atom and :low atom for low iteration respectively.
   """
-  @spec iterate(pos_integer, atom) :: list
-  def iterate(num, :high) do
-    do_iterate(num, [], :high, :no)
-  end
-
-  def iterate(num, :low) do
-    do_iterate(num, [], :low, :no)
-  end
-
+  @spec iterate(integer, atom) :: {:error, <<_::64, _::_*8>>} | {:ok, list}
   def iterate(num, endian) do
-    if num < 0 do
-      raise("Inappropriate first argument! Expected value greater than zero but got #{inspect endian}")
-    end
-    if not (endian == :high or endian == :low) do
-      raise("Inappropriate second argument! Expected :high or :low but got #{inspect endian}")
+    require Validator
+    case Validator.validate(num, endian) do
+      {:ok, _} -> {:ok, do_iterate(num, [], endian, :no)}
+      {:error, msg} -> {:error, msg}
     end
   end
 
@@ -30,26 +21,12 @@ defmodule MergeSimulation do
   Set second argument as :high atom and :low atom for low iteration respectively.
   Can be inspected if passed `:yes` atom as third argument
   """
-  def iterate(num, :high, :yes) do
-    do_iterate(num, [], :high, :yes)
-  end
-
-  def iterate(num, :low, :yes) do
-    if num < 0 do
-      raise("Inappropriate first argument! Expected value greater than zero but got #{inspect num}")
-    end
-    do_iterate(num, [], :low, :yes)
-  end
-
+  @spec iterate(integer, atom, atom) :: {:error, <<_::64, _::_*8>>} | {:ok, list}
   def iterate(num, endian, inspect) do
-    if num < 0 do
-      raise("Inappropriate first argument! Expected value greater than zero but got #{inspect num}")
-    end
-    if not (endian == :high or endian == :low) do
-      raise("Inappropriate second argument! Expected :high or :low but got #{inspect endian}")
-    end
-    if not (inspect == :yes or endian == :no) do
-      raise("Inappropriate third argument! Expected :yes or :no but got #{inspect endian}")
+    require Validator
+    case Validator.validate(num, endian, inspect) do
+      {:ok, _} -> {:ok, do_iterate(num, [], endian, inspect)}
+      {:error, msg} -> {:error, msg}
     end
   end
 
