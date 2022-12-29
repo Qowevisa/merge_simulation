@@ -7,7 +7,7 @@ defmodule MergeSimulation do
   Simulates `num` iterations. Simulation can be high or low.
   Set second argument as :high atom and :low atom for low iteration respectively.
   """
-  @spec iterate(integer, atom) :: {:error, <<_::64, _::_*8>>} | {:ok, list}
+  @spec iterate(integer, atom) :: {:error, <<_::64, _::_*8>>} | {:ok, list(integer)}
   def iterate(num, endian) do
     require Validator
 
@@ -22,7 +22,7 @@ defmodule MergeSimulation do
   Set second argument as :high atom and :low atom for low iteration respectively.
   Can be inspected if passed `:yes` atom as third argument
   """
-  @spec iterate(integer, atom, atom) :: {:error, <<_::64, _::_*8>>} | {:ok, list}
+  @spec iterate(integer, atom, atom) :: {:error, <<_::64, _::_*8>>} | {:ok, list(integer)}
   def iterate(num, endian, inspect) do
     require Validator
 
@@ -32,7 +32,7 @@ defmodule MergeSimulation do
     end
   end
 
-  @spec do_iterate(integer, list, atom, atom) :: list
+  @spec do_iterate(integer, list, atom, atom) :: list(integer)
   defp do_iterate(num, list, endian, inspect) do
     new_list = if length(list) == 0, do: list ++ [0], else: merge_list(list ++ [0], endian)
     if inspect == :yes, do: IO.inspect(new_list, label: 'List in iteration:')
@@ -46,23 +46,55 @@ defmodule MergeSimulation do
 
   @doc """
   Merging list is done with converting two integers
-  with same number into one that is bigger by 1 in high order.
+  with same number into one that is bigger by 1 in `endian` order.
   For example if function will see two [0, 0] it will transform it into [1]
   Uses private function with tail-end recursion
-  Returns one iteration for high order merging.
+  Returns one iteration for high or low order merging.
+  `MergeSimulation.merge_list([...], :high)` is the same as
+  `MergeSimulation.merge_list([...])`
+
+  ## Examples
+
+      eix> MergeSimulation.merge_list([2, 1, 0, 0], :low)
+      [2, 1, 1]
+      eix> MergeSimulation.merge_list([3, 3, 2, 1, 1, 0], :low)
+      [3, 3, 2, 2, 0]
+      eix> MergeSimulation.merge_list([4, 2, 1, 1, 0, 0], :high)
+      [4, 2, 2, 0, 0]
+      eix> MergeSimulation.merge_list([4, 2, 2, 0, 0], :low)
+      [4, 2, 2, 1]
+      eix> MergeSimulation.merge_list([4, 3, 0, 0], :high)
+      [4, 3, 1]
+
+  """
+  @spec merge_list(list(integer), :high | :low) :: list(integer)
+  def merge_list(list, endian) do
+    do_merge_list(list, [], endian)
+  end
+
+  @doc """
+  Merging list is done with converting two integers
+  with same number into one that is bigger by 1.
+  For example if function will see two [0, 0] it will transform it into [1]
+  Uses private function with tail-end recursion
+  Returns one meging iteration.
+  Merge is done in *high* order.
 
   ## Examples
 
       eix> MergeSimulation.merge_list([2, 1, 0, 0])
       [2, 1, 1]
-      eix> MergeSimulation.merge_list([3, 2, 1, 0])
-      [3, 2, 1, 0]
+      eix> MergeSimulation.merge_list([3, 3, 2, 1, 1, 0])
+      [4, 2, 1, 1, 0]
+      eix> MergeSimulation.merge_list([4, 2, 1, 1, 0, 0])
+      [4, 2, 2, 0, 0]
+      eix> MergeSimulation.merge_list([4, 2, 2, 0, 0])
+      [4, 3, 0, 0]
+      eix> MergeSimulation.merge_list([4, 3, 0, 0])
+      [4, 3, 1]
 
   """
-  def merge_list(list, endian) do
-    do_merge_list(list, [], endian)
-  end
-
+  @spec merge_list(list(integer)) :: list(integer)
   def merge_list(list) do
     do_merge_list(list, [], :high)
   end
