@@ -10,6 +10,7 @@ defmodule MergeSimulation do
   @spec iterate(integer, atom) :: {:error, <<_::64, _::_*8>>} | {:ok, list}
   def iterate(num, endian) do
     require Validator
+
     case Validator.validate(num, endian) do
       {:ok, _} -> {:ok, do_iterate(num, [], endian, :no)}
       {:error, msg} -> {:error, msg}
@@ -24,6 +25,7 @@ defmodule MergeSimulation do
   @spec iterate(integer, atom, atom) :: {:error, <<_::64, _::_*8>>} | {:ok, list}
   def iterate(num, endian, inspect) do
     require Validator
+
     case Validator.validate(num, endian, inspect) do
       {:ok, _} -> {:ok, do_iterate(num, [], endian, inspect)}
       {:error, msg} -> {:error, msg}
@@ -33,7 +35,8 @@ defmodule MergeSimulation do
   @spec do_iterate(integer, list, atom, atom) :: list
   defp do_iterate(num, list, endian, inspect) do
     new_list = if length(list) == 0, do: list ++ [0], else: merge_list(list ++ [0], endian)
-    if inspect == :yes, do: IO.inspect new_list, label: 'List in iteration:'
+    if inspect == :yes, do: IO.inspect(new_list, label: 'List in iteration:')
+
     if num == 1 do
       new_list
     else
@@ -57,34 +60,32 @@ defmodule MergeSimulation do
 
   """
   def merge_list(list, endian) do
-    if endian == :high do
-      do_merge_list(list, [])
-    else
-      do_merge_list_little_endian(list, [])
-    end
+    do_merge_list(list, [], endian)
   end
 
   def merge_list(list) do
-    do_merge_list(list, [])
+    do_merge_list(list, [], :high)
   end
 
-  defp do_merge_list(list, acc) do
+  defp do_merge_list(list, acc, :high) do
     [f, s] ++ xs = list
+
     if f == s do
       acc ++ [f + 1] ++ xs
     else
-      if length(list) == 2, do: acc ++ list, else:
-      do_merge_list([s] ++ xs, acc ++ [f])
+      if length(list) == 2, do: acc ++ list, else: do_merge_list([s] ++ xs, acc ++ [f], :high)
     end
   end
 
-  defp do_merge_list_little_endian(list, acc) do
+  defp do_merge_list(list, acc, :low) do
     [f, s] ++ xs = Enum.reverse(list)
+
     if f == s do
       Enum.reverse(xs) ++ [f + 1] ++ acc
     else
-      if length(list) == 2, do: list ++ acc, else:
-      do_merge_list_little_endian(Enum.reverse(xs) ++ [s], [f] ++ acc)
+      if length(list) == 2,
+        do: list ++ acc,
+        else: do_merge_list(Enum.reverse(xs) ++ [s], [f] ++ acc, :low)
     end
   end
 end
