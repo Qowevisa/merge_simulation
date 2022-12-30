@@ -4,6 +4,10 @@
         {
             "done": false,
             "title": "Add comparasion between high and low iteration and create data for python matplotlib for funzies"
+        },
+        {
+            "done": false,
+            "title": "Any argument validation in Validator module"
         }
     ]
 }
