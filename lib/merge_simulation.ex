@@ -25,11 +25,9 @@ defmodule MergeSimulation do
       else: merge_list(list ++ [0], endian)
     if inspect == :yes, do: IO.puts('List in iteration: #{inspect(new_list)} #{was_merged}')
 
-    if num == 1 do
-      new_list
-    else
-      do_iterate(num - 1, new_list, endian, inspect)
-    end
+    if num == 1,
+      do: new_list,
+      else: do_iterate(num - 1, new_list, endian, inspect)
   end
 
   @doc """
