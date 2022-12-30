@@ -9,7 +9,7 @@ defmodule MergeSimulation do
   Can be inspected if passed `:yes` atom as third argument
   """
   @spec iterate(integer, atom, atom) :: {:error, <<_::64, _::_*8>>} | {:ok, list(integer)}
-  def iterate(num, endian, inspect \\ :no) do
+  def iterate(num, endian \\ :high, inspect \\ :no) do
     require Validator
 
     case Validator.validate(num, endian, inspect) do
@@ -20,8 +20,10 @@ defmodule MergeSimulation do
 
   @spec do_iterate(integer, list, atom, atom) :: list(integer)
   defp do_iterate(num, list, endian, inspect) do
-    new_list = if length(list) == 0, do: list ++ [0], else: merge_list(list ++ [0], endian)
-    if inspect == :yes, do: IO.inspect(new_list, label: 'List in iteration:')
+    {new_list, was_merged} = if length(list) == 0,
+      do: {list ++ [0], :no},
+      else: merge_list(list ++ [0], endian)
+    if inspect == :yes, do: IO.puts('List in iteration: #{inspect(new_list)} #{was_merged}')
 
     if num == 1 do
       new_list
@@ -35,7 +37,8 @@ defmodule MergeSimulation do
   with same number into one that is bigger by 1 in `endian` order.
   For example if function will see two [0, 0] it will transform it into [1]
   Uses private function with tail-end recursion
-  Returns one iteration for high or low order merging.
+  Returns turple that contains one iteration for high or low order merging and atom
+  that signals if it was merged or not.
 
   ## Examples
 
@@ -51,7 +54,7 @@ defmodule MergeSimulation do
       [4, 3, 1]
 
   """
-  @spec merge_list(list(integer), :high | :low) :: list(integer)
+  @spec merge_list(list(integer), :high | :low) :: {list(integer), :yes | :no}
   def merge_list(list, endian \\ :high) do
     do_merge_list(list, [], endian)
   end
@@ -60,10 +63,10 @@ defmodule MergeSimulation do
     [f, s] ++ xs = list
 
     if f == s do
-      acc ++ [f + 1] ++ xs
+      {acc ++ [f + 1] ++ xs, :yes}
     else
       if length(list) == 2,
-        do: acc ++ list,
+        do: {acc ++ list, :no},
         else: do_merge_list([s] ++ xs, acc ++ [f], :high)
     end
   end
@@ -72,10 +75,10 @@ defmodule MergeSimulation do
     [f, s] ++ xs = Enum.reverse(list)
 
     if f == s do
-      Enum.reverse(xs) ++ [f + 1] ++ acc
+      {Enum.reverse(xs) ++ [f + 1] ++ acc, :yes}
     else
       if length(list) == 2,
-        do: list ++ acc,
+        do: {list ++ acc, :no},
         else: do_merge_list(Enum.reverse(xs) ++ [s], [f] ++ acc, :low)
     end
   end
