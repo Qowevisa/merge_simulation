@@ -22,7 +22,11 @@ defmodule MergeSimulation do
     %{list: high_list, merged: high_merged} = do_iterate(1, high_list, :high, :no)
 
     if num == 1,
-      do: %{ind_list: ind_list, comp_list: comp_list, merge_list: merge_list},
+      do: %{
+        ind_list: ind_list,
+        comp_list: comp_list ++ [boolean_to_integer(low_list == high_list)],
+        merge_list: merge_list ++ [boolean_to_integer(low_merged == high_merged)]
+      },
       else:
         do_compare(
           num - 1,
