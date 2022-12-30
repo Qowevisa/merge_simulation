@@ -71,4 +71,19 @@ defmodule Validator do
       Validator.__define__(unquote(num), unquote(endian), unquote(inspect))
     end
   end
+
+  # List validation
+
+  @spec __define_tuple__({any, atom}) :: {:error, <<_::64, _::_*8>>} | {:ok, any}
+  def __define_tuple__(pack) do
+    {value, type} = pack
+    case type do
+      :num -> __do_validate__(value, type)
+      :endian -> __do_validate__(value, type)
+      :inspect -> __do_validate__(value, type)
+      _ -> {:error, "Inappropriate type! " <>
+      " Expected :num | :endian | :inspect but got #{inspect(type)}"}
+    end
+  end
+
 end
