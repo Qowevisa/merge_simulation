@@ -1,0 +1,9 @@
+{
+    "name": "merge_simulation",
+    "todos": [
+        {
+            "done": false,
+            "title": "Add comparasion between high and low iteration and create data for python matplotlib for funzies"
+        }
+    ]
+}
