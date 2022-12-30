@@ -3,6 +3,41 @@ defmodule MergeSimulation do
   Documentation for `MergeSimulation`.
   """
 
+  @spec compare(integer) :: {:ok}
+  def compare(num) do
+    %{ind_list: ind_list, comp_list: comp_list, merge_list: merge_list} =
+      do_compare(num, [], [], [], [], [])
+
+    {:ok, file} = File.open("data_1", [:write])
+    IO.puts(file, "#{inspect(ind_list, limit: :infinity)}")
+    IO.puts(file, "#{inspect(comp_list, limit: :infinity)}")
+    IO.puts(file, "#{inspect(merge_list, limit: :infinity)}")
+    {:ok}
+  end
+
+  defp do_compare(num, low_list, high_list, ind_list, comp_list, merge_list) do
+    # will be [1..]
+    ind_list = ind_list ++ [length(ind_list) + 1]
+    %{list: low_list, merged: low_merged} = do_iterate(1, low_list, :low, :no)
+    %{list: high_list, merged: high_merged} = do_iterate(1, high_list, :high, :no)
+
+    if num == 1,
+      do: %{ind_list: ind_list, comp_list: comp_list, merge_list: merge_list},
+      else:
+        do_compare(
+          num - 1,
+          low_list,
+          high_list,
+          ind_list,
+          comp_list ++ [boolean_to_integer(low_list == high_list)],
+          merge_list ++ [boolean_to_integer(low_merged == high_merged)]
+        )
+  end
+
+  defp boolean_to_integer(bool) do
+    if bool, do: 1, else: 0
+  end
+
   @doc """
   Simulates `num` iterations. Simulation can be high or low.
   Set second argument as :high atom and :low atom for low iteration respectively.
