@@ -13,20 +13,26 @@ defmodule MergeSimulation do
     require Validator
 
     case Validator.validate(num, endian, inspect) do
-      {:ok, _} -> {:ok, do_iterate(num, [], endian, inspect)}
+      {:ok, _} -> {:ok, do_iterate(num, [], endian, inspect)[:list]}
       {:error, msg} -> {:error, msg}
     end
   end
 
-  @spec do_iterate(integer, list, atom, atom) :: list(integer)
+  # Merged atom is used when num is 1 and we need to check was on that iteration list merged or not
+  @spec do_iterate(integer, list, :high | :low, :yes | :no) :: %{
+          list: list(integer),
+          merged: :yes | :no
+        }
   defp do_iterate(num, list, endian, inspect) do
-    {new_list, was_merged} = if length(list) == 0,
-      do: {list ++ [0], :no},
-      else: merge_list(list ++ [0], endian)
+    {new_list, was_merged} =
+      if length(list) == 0,
+        do: {list ++ [0], :no},
+        else: merge_list(list ++ [0], endian)
+
     if inspect == :yes, do: IO.puts('List in iteration: #{inspect(new_list)} #{was_merged}')
 
     if num == 1,
-      do: new_list,
+      do: %{list: new_list, merged: was_merged},
       else: do_iterate(num - 1, new_list, endian, inspect)
   end
 
