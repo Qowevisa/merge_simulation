@@ -44,7 +44,7 @@ defmodule MergeSimulation do
     {:ok, file} = File.open("data_2", [:write])
     IO.puts(file, "#{inspect(ind_list, limit: :infinity)}")
     IO.puts(file, "#{inspect(data_list, limit: :infinity)}")
-    {:ok}
+    {:ok, length(data_list)}
   end
 
   defp do_compare_bar(
