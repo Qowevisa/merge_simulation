@@ -2,12 +2,16 @@
     "name": "merge_simulation",
     "todos": [
         {
-            "done": false,
+            "done": true,
             "title": "Add comparasion between high and low iteration and create data for python matplotlib for funzies"
         },
         {
             "done": false,
             "title": "Any argument validation in Validator module"
+        },
+        {
+            "done": true,
+            "title": "Add compare_bar to show data in needed format"
         }
     ]
 }
