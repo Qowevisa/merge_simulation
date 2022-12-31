@@ -39,7 +39,12 @@ defmodule MergeSimulation do
   end
 
   def compare_bar(num) do
-    do_compare_bar(num, [], [], 1, false, 0, [], [])
+    %{ind_list: ind_list, data_list: data_list} = do_compare_bar(num, [], [], 1, false, 0, [], [])
+
+    {:ok, file} = File.open("data_2", [:write])
+    IO.puts(file, "#{inspect(ind_list, limit: :infinity)}")
+    IO.puts(file, "#{inspect(data_list, limit: :infinity)}")
+    {:ok}
   end
 
   defp do_compare_bar(
