@@ -38,6 +38,64 @@ defmodule MergeSimulation do
         )
   end
 
+  def compare_bar(num) do
+    do_compare_bar(num, [], [], 1, false, 0, [], [])
+  end
+
+  defp do_compare_bar(
+         num,
+         low_list,
+         high_list,
+         iteration,
+         comp_status,
+         data_acc,
+         ind_list,
+         data_list
+       ) do
+    %{list: low_list, merged: _} = do_iterate(1, low_list, :low, :no)
+    %{list: high_list, merged: _} = do_iterate(1, high_list, :high, :no)
+
+    if num == 1 do
+      %{
+        ind_list: Enum.take(ind_list, length(ind_list) - 1),
+        data_list: Enum.take(data_list, -(length(data_list) - 1))
+      }
+    else
+      if do_we_switch?(low_list, high_list, comp_status) do
+        do_compare_bar(
+          num - 1,
+          low_list,
+          high_list,
+          iteration + 1,
+          low_list == high_list,
+          1,
+          ind_list ++ [iteration],
+          data_list ++ [data_acc]
+        )
+      else
+        do_compare_bar(
+          num - 1,
+          low_list,
+          high_list,
+          iteration + 1,
+          comp_status,
+          data_acc + 1,
+          ind_list,
+          data_list
+        )
+      end
+    end
+  end
+
+  defp do_we_switch?(low_list, high_list, comp_status) do
+    if Bitwise.bxor(boolean_to_integer(low_list == high_list), boolean_to_integer(comp_status)) ==
+         1 do
+      true
+    else
+      false
+    end
+  end
+
   defp boolean_to_integer(bool) do
     if bool, do: 1, else: 0
   end
